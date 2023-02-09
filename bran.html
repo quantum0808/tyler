@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Spring Oscillation Simulation</title>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.0.0/lib/p5.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.0.0/lib/p5.dom.js"></script>
+    <style>
+      canvas {
+        border: 1px solid black;
+      }
+      button {
+        margin: 10px;
+        padding: 5px;
+        font-size: 16px;
+        border-radius: 5px;
+        border: 1px solid black;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="buttons">
+      <button id="mass-button">Change Mass</button>
+      <button id="k-button">Change Force Constant</button>
+    </div>
+    <div id="graph">
+      <canvas id="time-graph" width="400" height="200"></canvas>
+    </div>
+    <script>
+      let spring;
+      let timeGraph;
+
+      function setup() {
+        createCanvas(400, 400);
+        spring = new Spring(width / 2, height / 2, 64, 0.1);
+        timeGraph = new TimeGraph(0, 0, 400, 200);
+        document.getElementById("mass-button").addEventListener("click", function() {
+          spring.m = random(1, 10);
+        });
+        document.getElementById("k-button").addEventListener("click", function() {
+          spring.k = random(0.1, 1);
+        });
+      }
+
+      function draw() {
+        background(255);
+        spring.go();
+        timeGraph.addPoint(spring.y);
+        timeGraph.draw();
+      }
+
+      class Spring {
+        constructor(x, y, r, k) {
+          this.x = x;
+          this.y = y;
+          this.r = r;
+          this.m = 1;
+          this.k = k;
+          this.vy = 0;
+          this.ay = 0;
+        }
+
+        go() {
+          this.update();
+          this.display();
+        }
+
+        update() {
+          let force = -this.k * (this.y - this.r);
+          this.ay = force / this.m;
+          this.vy += this.ay;
+          this.y += this.vy;
+        }
+
+        display() {
+          stroke(0);
+          strokeWeight(2);
+          fill(175);
+          rectMode(CENTER);
+          rect(this.x, this.y, 32, 32);
+          line(this.x, this.y, this.x, this.y + this.r);
+        }
+      }
+
+      class TimeGraph {
+        constructor(x, y, w, h) {
+          this.x = x;
+          this.y = y
